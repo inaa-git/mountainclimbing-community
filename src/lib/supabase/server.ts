@@ -19,8 +19,8 @@ export async function createClient() {
           );
         } catch {
           // `setAll` is called from a Server Component, where cookies
-          // cannot be mutated. Safe to ignore as long as the middleware
-          // in src/middleware.ts keeps refreshing the session.
+          // cannot be mutated. Safe to ignore as long as the proxy in
+          // src/proxy.ts keeps refreshing the session.
         }
       },
     },
