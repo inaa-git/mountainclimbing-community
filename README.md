@@ -55,10 +55,10 @@ This project uses [Supabase](https://supabase.com) for auth and data, via
 
 ### Client structure
 
-- `src/lib/supabase/client.ts` — browser client (Client Components).
-- `src/lib/supabase/server.ts` — server client for Server Components and
+- `lib/supabase/client.ts` — browser client (Client Components).
+- `lib/supabase/server.ts` — server client for Server Components and
   Route Handlers, backed by Next.js cookies.
-- `src/lib/supabase/middleware.ts` + `src/proxy.ts` — refreshes the
+- `lib/supabase/middleware.ts` + `proxy.ts` — refreshes the
   Supabase auth session on every request.
 
 No sign-up/login UI or database tables are included yet — this is only the

@@ -2,12 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
+import type { Database } from "@/lib/supabase/database.types";
 
 export async function createClient() {
   const cookieStore = await cookies();
   const { url, anonKey } = getSupabasePublicEnv();
 
-  return createServerClient(url, anonKey, {
+  return createServerClient<Database>(url, anonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -20,7 +21,7 @@ export async function createClient() {
         } catch {
           // `setAll` is called from a Server Component, where cookies
           // cannot be mutated. Safe to ignore as long as the proxy in
-          // src/proxy.ts keeps refreshing the session.
+          // proxy.ts keeps refreshing the session.
         }
       },
     },
