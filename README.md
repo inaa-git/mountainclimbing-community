@@ -29,6 +29,41 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Supabase Setup
+
+This project uses [Supabase](https://supabase.com) for auth and data, via
+`@supabase/supabase-js` and `@supabase/ssr`.
+
+1. Create a project at [supabase.com](https://supabase.com/dashboard).
+2. In the Supabase dashboard, go to **Project Settings > API** and copy the
+   **Project URL** and **anon public** key.
+3. Copy `.env.example` to `.env.local` and fill in the values:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+4. `.env.local` is git-ignored and must never be committed. The
+   **service_role** key (`SUPABASE_SERVICE_ROLE_KEY`) is server-only, bypasses
+   Row Level Security, and must never be prefixed with `NEXT_PUBLIC_` or used
+   in client-side code.
+
+### Client structure
+
+- `src/lib/supabase/client.ts` — browser client (Client Components).
+- `src/lib/supabase/server.ts` — server client for Server Components and
+  Route Handlers, backed by Next.js cookies.
+- `src/lib/supabase/middleware.ts` + `src/proxy.ts` — refreshes the
+  Supabase auth session on every request.
+
+No sign-up/login UI or database tables are included yet — this is only the
+client/session foundation for future auth and data work.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
