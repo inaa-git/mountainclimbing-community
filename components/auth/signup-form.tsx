@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -10,6 +11,7 @@ import { signupSchema, type SignupValues } from "@/lib/auth/validation";
 import { createClient } from "@/lib/supabase/client";
 
 export function SignupForm() {
+  const router = useRouter();
   const [result, setResult] = useState<{ message: string; success: boolean } | null>(null);
   const {
     register,
@@ -35,10 +37,14 @@ export function SignupForm() {
       return;
     }
 
+    if (data.session) {
+      router.replace("/me");
+      router.refresh();
+      return;
+    }
+
     setResult({
-      message: data.session
-        ? "회원가입이 완료되었습니다. 내 페이지로 이동할 수 있습니다."
-        : "회원가입이 완료되었습니다. 받은 이메일에서 인증 링크를 확인해주세요.",
+      message: "회원가입이 완료되었습니다. 받은 이메일에서 인증 링크를 확인해주세요.",
       success: true,
     });
   }

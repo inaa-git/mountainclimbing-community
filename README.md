@@ -61,8 +61,20 @@ This project uses [Supabase](https://supabase.com) for auth and data, via
 - `lib/supabase/middleware.ts` + `proxy.ts` — refreshes the
   Supabase auth session on every request.
 
-No sign-up/login UI or database tables are included yet — this is only the
-client/session foundation for future auth and data work.
+### Implemented member system
+
+- Email sign-up with optional email confirmation
+- Email/password login and logout
+- Server-side protection for `/me` and `/me/profile`
+- Profile lookup and editing
+- `public.profiles` table linked to `auth.users`
+- Automatic profile creation after sign-up
+- Supabase Auth session refresh through `proxy.ts`
+- Row Level Security for authenticated profile reads and owner-only updates
+
+Apply `supabase/migrations/20260827010000_create_profiles.sql` to the Supabase
+project before using the member system. The migration creates the `profiles`
+table, constraints, triggers, grants, and RLS policies.
 
 ## Deploy on Vercel
 
