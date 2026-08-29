@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { AccountNav } from "@/components/auth/account-nav";
@@ -45,10 +46,15 @@ export default async function Home() {
       </header>
 
       <section className="px-4 py-8 sm:px-6 sm:py-12">
-        <div
-          className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-cover bg-center px-6 py-12 text-white shadow-sm sm:px-10 sm:py-16 lg:px-16 lg:py-20"
-          style={{ backgroundImage: "url('/images/home-hero.jpg')" }}
-        >
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-6 py-12 text-white shadow-sm sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+          <Image
+            src="/images/home-hero.webp"
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1200px) calc(100vw - 3rem), 1152px"
+            className="object-cover object-center"
+          />
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative max-w-3xl">
             <p className="text-sm font-bold tracking-[0.2em] text-emerald-200">TOGETHER ON THE TRAIL</p>
