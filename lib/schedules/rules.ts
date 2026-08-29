@@ -1,4 +1,9 @@
-export type JoinDecisionCode = "joined" | "already_joined" | "schedule_not_open" | "schedule_full";
+export type JoinDecisionCode =
+  | "joined"
+  | "already_joined"
+  | "schedule_not_open"
+  | "schedule_full"
+  | "waitlist_reserved";
 
 export function decideScheduleJoin(input: {
   scheduleStatus: string;
@@ -8,14 +13,19 @@ export function decideScheduleJoin(input: {
 }): JoinDecisionCode {
   if (input.scheduleStatus !== "open") return "schedule_not_open";
   if (input.participantStatus === "joined") return "already_joined";
+  if (input.participantStatus === "waitlisted") return "waitlist_reserved";
   if (input.maxParticipants !== null && input.joinedCount >= input.maxParticipants) {
     return "schedule_full";
   }
   return "joined";
 }
 
-export function canCancelScheduleParticipation(userId: string, leaderId: string) {
-  return userId !== leaderId;
+export function canCancelScheduleParticipation(
+  userId: string,
+  leaderId: string,
+  scheduleStatus: string,
+) {
+  return userId !== leaderId && scheduleStatus !== "completed" && scheduleStatus !== "cancelled";
 }
 
 export function isCapacityValid(maxParticipants: number | null, joinedCount: number) {

@@ -90,6 +90,8 @@ const participationMessages: Record<string, string> = {
   cancelled: "참가를 취소했습니다.",
   schedule_full: "정원이 모두 찼습니다.",
   schedule_not_open: "현재 참가할 수 없는 일정입니다.",
+  schedule_finalized: "완료되거나 취소된 일정에서는 참가를 취소할 수 없습니다.",
+  waitlist_reserved: "대기 상태는 현재 참가 기능에서 변경할 수 없습니다.",
   leader_cannot_cancel: "리더는 참가를 취소할 수 없습니다.",
   not_joined: "참가 중인 일정이 아닙니다.",
   not_found: "일정을 찾을 수 없습니다.",

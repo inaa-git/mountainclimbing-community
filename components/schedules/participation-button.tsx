@@ -25,8 +25,9 @@ export function ParticipationButton({
   const [message, setMessage] = useState<{ text: string; success: boolean } | null>(null);
 
   if (isLeader) return <span className="rounded-full bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800">리더</span>;
-  if (!isAuthenticated) return <Link className="primary-button" href="/login">로그인하고 참가하기</Link>;
   if (scheduleStatus === "cancelled") return <span className="font-semibold text-red-700">취소된 산행</span>;
+  if (scheduleStatus === "completed") return <span className="font-semibold text-zinc-600">완료된 산행</span>;
+  if (!isAuthenticated) return <Link className="primary-button" href="/login">로그인하고 참가하기</Link>;
   if (scheduleStatus !== "open" && !isJoined) return <span className="font-semibold text-zinc-600">모집 마감</span>;
   if (isFull && !isJoined) return <span className="font-semibold text-zinc-600">모집 마감</span>;
 

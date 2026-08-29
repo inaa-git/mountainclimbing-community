@@ -41,8 +41,25 @@ describe("schedule participation rules", () => {
   });
 
   it("prevents leaders from cancelling participation", () => {
-    expect(canCancelScheduleParticipation("leader", "leader")).toBe(false);
-    expect(canCancelScheduleParticipation("member", "leader")).toBe(true);
+    expect(canCancelScheduleParticipation("leader", "leader", "open")).toBe(false);
+    expect(canCancelScheduleParticipation("member", "leader", "open")).toBe(true);
+    expect(canCancelScheduleParticipation("member", "leader", "closed")).toBe(true);
+  });
+
+  it("prevents cancellation after a schedule is finalized", () => {
+    expect(canCancelScheduleParticipation("member", "leader", "completed")).toBe(false);
+    expect(canCancelScheduleParticipation("member", "leader", "cancelled")).toBe(false);
+  });
+
+  it("does not promote reserved waitlist rows through normal join", () => {
+    expect(
+      decideScheduleJoin({
+        scheduleStatus: "open",
+        participantStatus: "waitlisted",
+        joinedCount: 1,
+        maxParticipants: 5,
+      }),
+    ).toBe("waitlist_reserved");
   });
 
   it("prevents lowering capacity below joined count", () => {
