@@ -76,6 +76,58 @@ Apply `supabase/migrations/20260827010000_create_profiles.sql` to the Supabase
 project before using the member system. The migration creates the `profiles`
 table, constraints, triggers, grants, and RLS policies.
 
+## Schedule integration checklist
+
+Apply the schedule migrations in filename order before testing:
+
+1. `20260829010000_create_schedules.sql`
+2. `20260829020000_harden_schedule_integrity.sql`
+
+The hardening migration enforces the form's string lengths and same-day time
+ordering in PostgreSQL. Overnight hikes are not supported in this MVP; replace
+`schedules_time_order_check` in a future migration before adding them.
+
+Use two confirmed accounts in the live Supabase project for this manual check:
+
+1. As user A, create a schedule and confirm A is automatically listed as the
+   leader and as a joined participant.
+2. As user B, join it, confirm the joined count increases, cancel, confirm it
+   decreases, then rejoin and confirm it increases again.
+3. Create a schedule with capacity 2. Confirm the leader occupies one place,
+   B fills the final place, and a third account receives `schedule_full`.
+4. Change a joined schedule to `completed`. Confirm the UI has no cancel button
+   and a direct `cancel_schedule_participation` RPC call returns
+   `schedule_finalized` without changing the participant row.
+5. Change a schedule to `cancelled`. Confirm join and cancellation are both
+   rejected by their RPCs and the participant data remains unchanged.
+
+To check capacity concurrency, leave exactly one place, sign in as two different
+non-leader users in separate clients, and invoke `join_schedule` at nearly the
+same time. Verify one call succeeds, the other returns `schedule_full`, and this
+query never returns a count greater than `max_participants`:
+
+```sql
+select s.id, s.max_participants, count(sp.id) as joined_count
+from public.schedules s
+left join public.schedule_participants sp
+  on sp.schedule_id = s.id and sp.status = 'joined'
+where s.id = '<test-schedule-uuid>'
+group by s.id, s.max_participants;
+```
+
+`join_schedule` intentionally retains its `FOR UPDATE` schedule-row lock to
+serialize competing joins for the same capacity.
+
+### Schedule privacy TODO
+
+Authenticated users currently have SELECT access to participant rows so the
+schedule detail page can build its participant list. The UI only displays
+nickname, region, hiking level, and leader status; it never displays email.
+The database API can nevertheless expose participant UUIDs and statuses across
+schedules to authenticated callers. A future migration should replace this
+broad policy with a schedule-scoped participant-directory RPC or restricted
+view, after defining who may inspect each schedule's roster.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
