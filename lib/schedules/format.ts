@@ -19,7 +19,7 @@ export const scheduleStatusLabels: Record<ScheduleStatus, string> = {
   open: "모집 중",
   closed: "모집 마감",
   completed: "완료",
-  cancelled: "취소",
+  cancelled: "취소됨",
 };
 
 export function formatHikingDate(date: string) {

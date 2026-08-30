@@ -7,7 +7,11 @@ import { useForm } from "react-hook-form";
 
 import { createSchedule, updateSchedule } from "@/app/schedules/actions";
 import { FormMessage } from "@/components/auth/form-message";
-import { scheduleFormSchema, type ScheduleFormValues } from "@/lib/schedules/validation";
+import {
+  createScheduleFormSchema,
+  type CreateScheduleFormValues,
+  type ScheduleFormValues,
+} from "@/lib/schedules/validation";
 
 const emptySchedule: ScheduleFormValues = {
   title: "",
@@ -45,12 +49,16 @@ export function ScheduleForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ScheduleFormValues>({
-    resolver: zodResolver(scheduleFormSchema),
-    defaultValues: initialValues ?? emptySchedule,
+  } = useForm<CreateScheduleFormValues>({
+    resolver: zodResolver(createScheduleFormSchema),
+    defaultValues: {
+      ...emptySchedule,
+      ...initialValues,
+      join_as_participant: true,
+    },
   });
 
-  function submit(values: ScheduleFormValues) {
+  function submit(values: CreateScheduleFormValues) {
     setMessage(null);
     startTransition(async () => {
       const result =
@@ -142,6 +150,16 @@ export function ScheduleForm({
         <Field label="상세 설명" error={errors.description?.message} wide>
           <textarea className="form-input min-h-36 resize-y" {...register("description")} />
         </Field>
+        {mode === "create" ? (
+          <label className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 sm:col-span-2">
+            <input
+              className="size-5 accent-emerald-700"
+              type="checkbox"
+              {...register("join_as_participant")}
+            />
+            <span className="text-sm font-semibold text-emerald-950">이 산행에 나도 참가합니다</span>
+          </label>
+        ) : null}
       </div>
       {message ? <FormMessage message={message.text} success={message.success} /> : null}
       <button className="primary-button w-full sm:w-auto" disabled={isPending} type="submit">

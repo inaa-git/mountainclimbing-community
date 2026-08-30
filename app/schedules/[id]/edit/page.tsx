@@ -12,7 +12,7 @@ export default async function EditSchedulePage({ params }: { params: Promise<{ i
       <section className="mx-auto max-w-3xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
         <Link className="text-sm font-semibold text-zinc-600" href={`/schedules/${id}`}>← 일정 상세</Link>
         <h1 className="mt-5 text-3xl font-bold tracking-tight text-zinc-950">산행 일정 수정</h1>
-        <p className="mt-2 mb-8 text-zinc-600">리더만 일정 정보를 변경할 수 있습니다.</p>
+        <p className="mt-2 mb-8 text-zinc-600">작성자만 일정 정보를 변경할 수 있습니다.</p>
         <ScheduleForm
           mode="edit"
           scheduleId={id}

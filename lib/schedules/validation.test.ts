@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { scheduleFormSchema } from "@/lib/schedules/validation";
+import { createScheduleFormSchema, scheduleFormSchema } from "@/lib/schedules/validation";
 
 const validSchedule = {
   title: "북한산 주말 산행",
@@ -25,6 +25,13 @@ const validSchedule = {
 describe("scheduleFormSchema", () => {
   it("accepts a valid schedule", () => {
     expect(scheduleFormSchema.safeParse(validSchedule).success).toBe(true);
+  });
+
+  it("requires an explicit leader participation choice when creating", () => {
+    expect(
+      createScheduleFormSchema.safeParse({ ...validSchedule, join_as_participant: true }).success,
+    ).toBe(true);
+    expect(createScheduleFormSchema.safeParse(validSchedule).success).toBe(false);
   });
 
   it("rejects invalid capacity, distance, duration, and time range", () => {

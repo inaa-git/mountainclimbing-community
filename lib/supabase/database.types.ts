@@ -140,6 +140,10 @@ export interface Database {
     };
     Views: Record<never, never>;
     Functions: {
+      create_schedule: {
+        Args: { schedule_data: Record<string, unknown>; join_as_participant: boolean };
+        Returns: ScheduleRpcResult & { schedule_id?: string };
+      };
       join_schedule: { Args: { schedule_uuid: string }; Returns: ScheduleRpcResult };
       cancel_schedule_participation: { Args: { schedule_uuid: string }; Returns: ScheduleRpcResult };
       get_schedule_public_metadata: {

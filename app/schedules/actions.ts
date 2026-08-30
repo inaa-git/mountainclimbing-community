@@ -6,7 +6,11 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/guards";
 import { requireScheduleLeader } from "@/lib/schedules/guards";
 import { isCapacityValid } from "@/lib/schedules/rules";
-import { scheduleFormSchema, type ScheduleFormValues } from "@/lib/schedules/validation";
+import {
+  createScheduleFormSchema,
+  scheduleFormSchema,
+  type ScheduleFormValues,
+} from "@/lib/schedules/validation";
 
 export interface ScheduleActionResult {
   success: boolean;
@@ -36,21 +40,44 @@ function toSchedulePayload(values: ScheduleFormValues) {
   };
 }
 
+function toCreateSchedulePayload(values: ScheduleFormValues) {
+  return {
+    title: values.title.trim(),
+    description: values.description || null,
+    schedule_type: values.schedule_type,
+    hiking_date: values.hiking_date,
+    start_time: values.start_time,
+    end_time: values.end_time || null,
+    meeting_location: values.meeting_location.trim(),
+    region: values.region || null,
+    mountain_name: values.mountain_name.trim(),
+    course_description: values.course_description || null,
+    difficulty: values.difficulty,
+    max_participants: values.max_participants,
+    preparation: values.preparation || null,
+    transportation: values.transportation || null,
+    estimated_distance_km: values.estimated_distance_km,
+    estimated_duration_minutes: values.estimated_duration_minutes,
+  };
+}
+
 export async function createSchedule(input: unknown): Promise<ScheduleActionResult> {
-  const parsed = scheduleFormSchema.safeParse(input);
+  const parsed = createScheduleFormSchema.safeParse(input);
   if (!parsed.success) return { success: false, message: "입력값을 다시 확인해주세요." };
 
-  const { supabase, user } = await requireUser();
-  const { data, error } = await supabase
-    .from("schedules")
-    .insert({ ...toSchedulePayload(parsed.data), leader_id: user.id })
-    .select("id")
-    .single();
+  const { supabase } = await requireUser();
+  const { data, error } = await supabase.rpc("create_schedule", {
+    schedule_data: toCreateSchedulePayload(parsed.data),
+    join_as_participant: parsed.data.join_as_participant,
+  });
 
-  if (error || !data) return { success: false, message: "일정을 등록하지 못했습니다." };
+  if (error || !data?.success || !data.schedule_id) {
+    return { success: false, message: "일정을 등록하지 못했습니다." };
+  }
 
   revalidatePath("/schedules");
-  return { success: true, message: "일정을 등록했습니다.", scheduleId: data.id };
+  revalidatePath("/me");
+  return { success: true, message: "일정을 등록했습니다.", scheduleId: data.schedule_id };
 }
 
 export async function updateSchedule(scheduleId: string, input: unknown): Promise<ScheduleActionResult> {
@@ -81,6 +108,7 @@ export async function updateSchedule(scheduleId: string, input: unknown): Promis
 
   revalidatePath("/schedules");
   revalidatePath(`/schedules/${scheduleId}`);
+  revalidatePath("/me");
   return { success: true, message: "일정을 수정했습니다.", scheduleId };
 }
 
@@ -92,7 +120,6 @@ const participationMessages: Record<string, string> = {
   schedule_not_open: "현재 참가할 수 없는 일정입니다.",
   schedule_finalized: "완료되거나 취소된 일정에서는 참가를 취소할 수 없습니다.",
   waitlist_reserved: "대기 상태는 현재 참가 기능에서 변경할 수 없습니다.",
-  leader_cannot_cancel: "리더는 참가를 취소할 수 없습니다.",
   not_joined: "참가 중인 일정이 아닙니다.",
   not_found: "일정을 찾을 수 없습니다.",
   unauthenticated: "로그인이 필요합니다.",
@@ -110,6 +137,7 @@ async function runParticipationRpc(
   const result = data as { success: boolean; code: string };
   revalidatePath("/schedules");
   revalidatePath(`/schedules/${scheduleId}`);
+  revalidatePath("/me");
   return {
     success: result.success,
     message: participationMessages[result.code] ?? "요청을 처리했습니다.",

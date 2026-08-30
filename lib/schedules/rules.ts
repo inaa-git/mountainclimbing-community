@@ -20,12 +20,12 @@ export function decideScheduleJoin(input: {
   return "joined";
 }
 
-export function canCancelScheduleParticipation(
-  userId: string,
-  leaderId: string,
-  scheduleStatus: string,
-) {
-  return userId !== leaderId && scheduleStatus !== "completed" && scheduleStatus !== "cancelled";
+export function canCancelScheduleParticipation(scheduleStatus: string) {
+  return scheduleStatus !== "completed" && scheduleStatus !== "cancelled";
+}
+
+export function shouldCreateLeaderParticipation(joinAsParticipant: boolean) {
+  return joinAsParticipant;
 }
 
 export function isCapacityValid(maxParticipants: number | null, joinedCount: number) {

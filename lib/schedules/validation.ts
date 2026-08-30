@@ -31,3 +31,9 @@ export const scheduleFormSchema = z
   });
 
 export type ScheduleFormValues = z.infer<typeof scheduleFormSchema>;
+
+export const createScheduleFormSchema = scheduleFormSchema.and(
+  z.object({ join_as_participant: z.boolean() }),
+);
+
+export type CreateScheduleFormValues = z.infer<typeof createScheduleFormSchema>;

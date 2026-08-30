@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ParticipantAuthorBadge } from "@/components/schedules/participant-author-badge";
 import { ParticipationButton } from "@/components/schedules/participation-button";
 import { getPublicScheduleMetadata } from "@/lib/schedules/data";
 import {
@@ -78,7 +79,7 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
             </span>
           </div>
           <h1 className="mt-5 text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">{schedule.title}</h1>
-          <p className="mt-3 text-zinc-600">리더 {publicMetadata?.leader_nickname ?? "알 수 없음"}</p>
+          <p className="mt-3 text-zinc-600">작성자 {publicMetadata?.leader_nickname ?? "알 수 없음"}</p>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
             <Detail label="날짜" value={formatHikingDate(schedule.hiking_date)} />
@@ -134,9 +135,7 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
                 <li className="flex flex-col justify-between gap-2 py-4 sm:flex-row sm:items-center" key={participant.userId}>
                   <div>
                     <span className="font-semibold text-zinc-900">{participant.nickname}</span>
-                    {participant.userId === schedule.leader_id ? (
-                      <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">리더</span>
-                    ) : null}
+                    <ParticipantAuthorBadge isAuthor={participant.userId === schedule.leader_id} />
                   </div>
                   <span className="text-sm text-zinc-600">
                     {participant.region || "지역 미설정"} · {hikingLevelLabel(participant.hikingLevel)}
